@@ -1,62 +1,63 @@
-//課題19　DB_トランザクション_MySQL
 package raisetech3.StudentManagement3;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @SpringBootApplication
 @RestController
 public class Application {
 
-	// シンプルな学生情報（名前と年齢）
-	private String name = "Enami Kouji";
-	private String age = "37";
-
-	// 複数の学生情報（Mapを使ったパターン）
-	private Map<String, String> student = new ConcurrentHashMap<>();
+	@Autowired
+	private StudentRepository repository;
 
 	// メインメソッド（アプリケーションのエントリーポイント）
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
 	}
 
-	// ①シンプルな学生情報を取得するエンドポイント
-	@GetMapping("/studentInfo")
-	public String getStudentInfo() {
-		return name + " " + age + "歳";
+	// ①特定の学生情報を取得するエンドポイント
+	// クエリパラメータで指定した名前の学生情報を取得する
+	@GetMapping("/student")
+	public String getStudent(@RequestParam String name) {
+		Student student = repository.searchByName(name);
+		return student.getName() + " " + student.getAge() + "歳";
 	}
 
-	// ②シンプルな学生情報を更新するエンドポイント
-	@PostMapping("/studentInfo")
-	public String setStudentInfo(@RequestParam String name, @RequestParam String age) {
-		this.name = name;
-		this.age = age;
-		return "学生情報が更新されました：" + name + " " + age + "歳";
+	// ②新規の学生情報を登録するエンドポイント
+	// 指定した名前と年齢で新しい学生情報をデータベースに登録する
+	@PostMapping("/student")
+	public void registerStudent(@RequestParam String name, @RequestParam int age) {
+		repository.registerStudent(name, age);
 	}
 
-	// ③名前のみ更新するエンドポイント
-	@PostMapping("/studentName")
-	public String updateStudentName(@RequestParam String name) {
-		this.name = name;
-		return "学生の名前が更新されました：" + name;
+	// ③既存の学生情報を更新するエンドポイント
+	// 名前で検索した学生の年齢を更新する
+	@PatchMapping("/student")
+	public void updateStudent(@RequestParam String name, @RequestParam int age) {
+		repository.updateStudent(name, age);
 	}
 
-	// ④Mapを使った複数の学生情報を取得するエンドポイント
-	@GetMapping("/studentInfo2")
-	public Map<String, String> getStudentMap() {
-		return student;
+	// ④特定の学生情報を削除するエンドポイント
+	// 名前で指定した学生情報をデータベースから削除する
+	@DeleteMapping("/student")
+	public void deleteStudent(@RequestParam String name){
+		repository.deleteStudent(name);
 	}
 
-	// ⑤Mapを使って学生情報を追加するエンドポイント
-	@PostMapping("/studentInfo2/add")
-	public String addStudentToMap(@RequestParam String name, @RequestParam String age) {
-		student.put(name, age + "歳");
-		return "学生情報が追加されました：" + name + " " + age + "歳";
+	// ⑤全ての学生情報を取得するエンドポイント
+	// データベースにある全ての学生情報を取得して返す
+	@GetMapping("/students")
+	public List<Student> getAllStudents() {
+		return repository.getAllStudents();
 	}
 }
