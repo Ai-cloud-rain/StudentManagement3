@@ -1,4 +1,4 @@
-//課題２１
+//課題２２
 package raisetech3.StudentManagement3;
 
 import org.springframework.beans.factory.annotation.Autowired;
