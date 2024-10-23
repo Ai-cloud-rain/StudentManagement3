@@ -1,4 +1,4 @@
-//課題２4
+//課題２５
 package raisetech3.StudentManagement3;
 
 import org.springframework.boot.SpringApplication;
