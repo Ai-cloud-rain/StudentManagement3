@@ -34,7 +34,9 @@ public class StudentController {
 
   // ②コース情報のリストを取得するエンドポイント
   @GetMapping("/studentsCourseList")
-  public List<StudentsCourses> getStudentCourseList() {
-    return service.searchStudentCoursesList();
+  public String getStudentCourseList(Model model) {
+    List<StudentsCourses> studentsCourses = service.searchStudentCoursesList();
+    model.addAttribute("studentsCourses", studentsCourses);
+    return "studentsCourseList";  // 新しいHTMLテンプレートを指定
   }
 }
